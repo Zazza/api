@@ -12,10 +12,12 @@ class StaticCurrencyFixtures extends Fixture
     {
         $currency = new StaticCurrency();
         $currency->setName('RUB');
+        $currency->setMain(false);
         $manager->persist($currency);
 
         $currency = new StaticCurrency();
         $currency->setName('USD');
+        $currency->setMain(true);
         $manager->persist($currency);
 
         $manager->flush();

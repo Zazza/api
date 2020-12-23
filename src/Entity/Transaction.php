@@ -42,6 +42,7 @@ class Transaction
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\StaticCurrency", inversedBy="currencies")
+     * @Assert\NotNull(message="Choose a valid currency type.")
      */
     private $currency;
 
@@ -100,7 +101,7 @@ class Transaction
         return $this->currency;
     }
 
-    public function setCurrency(StaticCurrency $currency): self
+    public function setCurrency(?StaticCurrency $currency): self
     {
         $this->currency = $currency;
 

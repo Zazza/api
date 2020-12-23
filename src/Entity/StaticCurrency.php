@@ -22,6 +22,11 @@ class StaticCurrency
      */
     private $name;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $main;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -35,6 +40,18 @@ class StaticCurrency
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function isMain(): ?bool
+    {
+        return $this->main;
+    }
+
+    public function setMain(bool $main): self
+    {
+        $this->main = $main;
 
         return $this;
     }
