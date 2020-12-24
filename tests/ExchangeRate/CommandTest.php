@@ -9,15 +9,15 @@ class CommandTest extends TestCase
     public function testResponse(): void
     {
         $statusCode = 200;
-        $rate = 0.014;
-        $body = '{"rates":{"USD":'.$rate.'},"base":"RUB","date":"2020-12-23"}';
+        $rateRequest = 0.014;
+        $body = '{"rates":{"USD":'.$rateRequest.'},"base":"RUB","date":"2020-12-23"}';
 
         $mockGuzzle = new Guzzle();
         $source = new Exchange(
             $mockGuzzle->setStatusCode($statusCode)->setBody($body)
         );
-        $rate = $source->request('RUB');
+        $rateResponse = $source->request('RUB');
 
-        self::assertEquals($rate, $rate);
+        self::assertEquals($rateRequest, $rateResponse);
     }
 }

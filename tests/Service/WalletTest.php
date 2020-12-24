@@ -78,10 +78,18 @@ class WalletTest extends WebTestCase
         self::bootKernel();
         $this->walletService = self::$container->get(WalletService::class);
 
+        // Set balance > 0
         $this->walletService
             ->setWallet($this->wallets[0]->getId())
             ->setCurrency($this->currencies[0]->getName())
-            ->setAmount($amount = 1)
+            ->setAmount($amount = 1000)
+            ->updateBalance();
+
+        // Else one transaction
+        $this->walletService
+            ->setWallet($this->wallets[0]->getId())
+            ->setCurrency($this->currencies[0]->getName())
+            ->setAmount($amount = 1000)
             ->updateBalance();
 
         $walletRepository = $this->entityManager->getRepository(Wallet::class);
