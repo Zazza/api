@@ -31,7 +31,7 @@ SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT
 
 Так как эти типы постоянны они описаны константами в src/Entity/Transaction.php
 
-Другой тип используемый в этом приложении - валюты. Они описаны в таблице static_currency. При добавлении новой валюты, ее курс будет обновлен автоматически. 
+Другой тип используемый в этом приложении - валюты. Они описаны в таблице static_currency. При добавлении новой валюты, ее курс будет обновлен автоматически. И ее можно будет использовать в системе. 
 
 ## Технические требования
 * Серверная логика должна быть написана на PHP версии >=7.0
@@ -43,6 +43,7 @@ SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT
 * Все спорные вопросы в задаче может и должен решать Исполнитель;
 
 ## Установка
+
 ```shell script
 # git clone https://github.com/Zazza/api
 # cd ./api
@@ -66,7 +67,37 @@ SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT
    > loading App\DataFixtures\WalletFixtures
 ```
 
-Добавить команду: `/usr/local/php /[APP_PATH]/bin/console app:exchange_rates` в cron для обновления курса валют.
+**Добавить команду:** `/usr/local/php /[APP_PATH]/bin/console app:exchange_rates` в cron для обновления курса валют.
+
+## Использование
+
+`# curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://api.local/api/wallet/updateBalance/1' --data 'currency=RUB&type=credit&reason=stock&amount=5'`
+
+```shell script
+HTTP/1.1 200 OK
+Server: nginx/1.19.5
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache, private
+Date: Thu, 24 Dec 2020 14:05:16 GMT
+X-Robots-Tag: noindex
+```
+
+`# curl -X GET -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://api.local/api/wallet/getBalance/1'`
+
+```shell script
+HTTP/1.1 200 OK
+Server: nginx/1.19.5
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache, private
+Date: Thu, 24 Dec 2020 14:05:54 GMT
+X-Robots-Tag: noindex
+
+{"currency":"RUB","amount":582.09000000000003}
+```
 
 ## Тесты
 ```shell script
