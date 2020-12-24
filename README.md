@@ -48,7 +48,13 @@ SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT
 # git clone https://github.com/Zazza/api
 # cd ./api
 # composer install
+# cp .env.default .env
+# nano .env
+```
 
+В файле .env поправьте _DATABASE_URL_
+
+```shell script
 # php bin/console doctrine:migrations:migrate
  WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (yes/no) [yes]:
  >
