@@ -31,8 +31,8 @@ class ApiWalletController extends AbstractController
 
         return $this->json([
             'currency' => $wallet->getCurrency()->getName(),
-            'amount' => $wallet->getAmount() / Convert::CAST
-        ]);
+            'amount' => (string)($wallet->getAmount() / Convert::CAST)
+        ]);//, 200, [JSON_NUMERIC_CHECK]);
     }
 
     /**

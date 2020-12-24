@@ -109,7 +109,7 @@ Cache-Control: no-cache, private
 Date: Thu, 24 Dec 2020 14:05:54 GMT
 X-Robots-Tag: noindex
 
-{"currency":"RUB","amount":582.09000000000003}
+{"currency":"RUB","amount":582.09}
 ```
 
 ## Тесты
