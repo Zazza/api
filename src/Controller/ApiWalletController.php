@@ -3,6 +3,11 @@
 namespace App\Controller;
 
 use App\Exception\DbSaveException;
+use App\Exception\ExchangeRateException;
+use App\Exception\WalletNotFoundException;
+use App\Exception\CurrencyNotFoundException;
+use \Doctrine\DBAL\ConnectionException;
+use App\Service\Wallet as WalletService;
 use App\Service\Transaction as TransactionService;
 use App\Wallet\Convert;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,20 +20,18 @@ class ApiWalletController extends AbstractController
     /**
      * @Route("/api/wallet/getBalance/{id}", methods={"GET"}, name="api_wallet_get_balance")
      * @param int $id
-     * @param TransactionService $transaction
+     * @param WalletService $walletService
      * @return Response
+     * @throws WalletNotFoundException
      */
-    public function getBalance(int $id, TransactionService $transaction): Response
+    public function getBalance(int $id, WalletService $walletService): Response
     {
-        if (!$transaction->setWallet($id)) {
-            throw $this->createNotFoundException(
-                'No wallet found for id '.$id
-            );
-        }
+        $walletService->setWallet($id);
+        $wallet = $walletService->getWallet();
 
         return $this->json([
-            'currency' => $transaction->getWallet()->getCurrency()->getName(),
-            'amount' => $transaction->getWallet()->getAmount() / Convert::CAST
+            'currency' => $wallet->getCurrency()->getName(),
+            'amount' => $wallet->getAmount() / Convert::CAST
         ]);
     }
 
@@ -36,34 +39,37 @@ class ApiWalletController extends AbstractController
      * @Route("/api/wallet/updateBalance/{id}", methods={"POST"}, name="api_wallet_update_balance")
      * @param Request $request
      * @param int $id
-     * @param TransactionService $transaction
+     * @param WalletService $walletService
+     * @param TransactionService $transactionService
+     * @return Response
+     * @throws DbSaveException
+     * @throws ExchangeRateException
+     * @throws WalletNotFoundException
+     * @throws CurrencyNotFoundException
+     * @throws ConnectionException
      */
     public function updateBalance(
         Request $request,
         int $id,
-        TransactionService $transaction
+        WalletService $walletService,
+        TransactionService $transactionService
     ): Response
     {
-        if (!$transaction->setWallet($id)) {
-            throw $this->createNotFoundException(
-                'No wallet found for id '.$id
-            );
-        }
+        $walletService->setWallet($id);
 
-        try {
-            $transaction
-                ->setCurrency($request->request->get('currency'))
-                ->setAmount((float) $request->get('amount'))
-                ->add(
-                    $request->get('type'),
-                    $request->get('reason')
-                )
-                ->walletAmount();
-        } catch (DbSaveException $e) {
-            return $this->json([
-                'errors' => (string) $e->getMessage()
-            ], 400);
-        }
+        $transactionService
+            ->setWallet($id)
+            ->setCurrency($request->request->get('currency'))
+            ->setAmount($request->get('amount'))
+            ->add(
+                $request->get('type'),
+                $request->get('reason')
+            );
+
+        $walletService
+            ->setCurrency($request->request->get('currency'))
+            ->setAmount($request->get('amount'))
+            ->updateBalance();
 
         return $this->json([
             'result' => true

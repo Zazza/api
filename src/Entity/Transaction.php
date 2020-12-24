@@ -30,13 +30,13 @@ class Transaction
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\Choice(choices=Transaction::TRANSACTION_REASONS, message="Choose a valid transation reason.")
+     * @Assert\Choice(choices=Transaction::TRANSACTION_REASONS, message="Choose a valid transaction reason.")
      */
     private $reason_id;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\Choice(choices=Transaction::TRANSACTION_TYPES, message="Choose a valid transation type.")
+     * @Assert\Choice(choices=Transaction::TRANSACTION_TYPES, message="Choose a valid transaction type.")
      */
     private $type_id;
 
@@ -47,7 +47,7 @@ class Transaction
     private $currency;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Wallet", inversedBy="wallets")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Wallet", inversedBy="wallets", cascade={"persist"})
      */
     private $wallet;
 
@@ -62,6 +62,9 @@ class Transaction
      */
     private $created_at;
 
+    /**
+     * Transaction constructor.
+     */
     public function __construct()
     {
         $this->created_at = new \DateTime();

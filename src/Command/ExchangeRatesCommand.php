@@ -3,19 +3,25 @@ namespace App\Command;
 
 use App\Entity\CurrencyExchangeRate;
 use App\Entity\StaticCurrency;
-use App\Wallet\Exchange;
+use App\Wallet\ExchangeRate\Exchange;
+use App\Wallet\ExchangeRate\Guzzle;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class ExchangeRatesCommand
+ * Update exchange rate
+ * @package App\Command
+ */
 class ExchangeRatesCommand extends Command
 {
     protected static $defaultName = 'app:exchange_rates';
 
     /**
-     * @var
+     * @var EntityManager
      */
     private $entityManager;
 
@@ -36,7 +42,9 @@ class ExchangeRatesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $source = new Exchange();
+        $source = new Exchange(
+            new Guzzle()
+        );
 
         $currencyRepository = $this->entityManager->getRepository(StaticCurrency::class);
         $currencyList = $currencyRepository->findAll();

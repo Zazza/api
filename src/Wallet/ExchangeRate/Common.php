@@ -1,13 +1,30 @@
 <?php
 
-namespace App\Wallet;
+namespace App\Wallet\ExchangeRate;
 
-class Source
+/**
+ * Class Common
+ * @package App\Wallet\Source
+ */
+class Common
 {
-    /** @var int */
-    protected $request;
+    /**
+     * @var HttpClient
+     */
+    protected HttpClient $guzzle;
 
     /**
+     * @var int
+     */
+    protected $request;
+
+    public function __construct(HttpClient $guzzle)
+    {
+        $this->guzzle = $guzzle;
+    }
+
+    /**
+     * Json decode
      * @param $response
      * @return bool|mixed
      */

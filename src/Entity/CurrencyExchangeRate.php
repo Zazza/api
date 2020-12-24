@@ -29,6 +29,19 @@ class CurrencyExchangeRate
      */
     private $value;
 
+    /**
+     * @ORM\Column(type="datetimetz")
+     */
+    private $created_at;
+
+    /**
+     * CurrencyExchangeRate constructor.
+     */
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -54,6 +67,18 @@ class CurrencyExchangeRate
     public function setValue(string $value): self
     {
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
 
         return $this;
     }

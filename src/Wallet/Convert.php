@@ -2,24 +2,38 @@
 namespace App\Wallet;
 
 use App\Entity\CurrencyExchangeRate;
-use App\Entity\Wallet;
-use Doctrine\Persistence\ObjectRepository;
+use App\Entity\StaticCurrency;
+use App\Exception\ExchangeRateException;
+use App\Repository\CurrencyExchangeRateRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class Convert
+ * @package App\Wallet
+ */
 class Convert
 {
     const CAST = 100;
 
     /**
-     * @var Wallet
-     */
-    private $wallet;
-
-    /**
-     * @var ObjectRepository
+     * @var CurrencyExchangeRateRepository
      */
     private $exchangeRateRepository;
 
+    /**
+     * @var StaticCurrency
+     */
+    private StaticCurrency $walletCurrency;
+
+    /**
+     * @var StaticCurrency
+     */
+    private StaticCurrency $convertCurrency;
+
+    /**
+     * Convert constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $entityManager = $container->get('doctrine')->getManager();
@@ -27,42 +41,65 @@ class Convert
     }
 
     /**
-     * @param Wallet $wallet
-     * @return $this
+     * @param StaticCurrency $currency
+     * @return Convert
      */
-    public function setWallet(Wallet $wallet): self
+    public function setWalletCurrency(StaticCurrency $currency): Convert
     {
-        $this->wallet = $wallet;
-
+        $this->walletCurrency = $currency;
         return $this;
     }
 
-    public function calculate(int $currencyId, int $amount): int
+    /**
+     * @param StaticCurrency $currency
+     * @return Convert
+     */
+    public function setConvertCurrency(StaticCurrency $currency): Convert
     {
-        if ($currencyId === $this->wallet->getCurrency()->getId()) {
+        $this->convertCurrency = $currency;
+        return $this;
+    }
+
+    /**
+     * Convert amount from other currency
+     * @param int $amount
+     * @return int
+     * @throws ExchangeRateException
+     */
+    public function calculate(int $amount): int
+    {
+        if ($this->convertCurrency === $this->walletCurrency) {
             return $amount;
         }
 
-        if ($this->wallet->getCurrency()->isMain()) {
+        if ($this->walletCurrency->isMain()) {
             /** @var CurrencyExchangeRate $exchangeRate */
             $exchangeRate = $this->exchangeRateRepository->findBy(
-                ['currency_id' => $currencyId],
+                ['currency_id' => $this->convertCurrency->getId()],
                 ['id' => 'DESC'],
-                1, 0);
+                1, 0
+            );
+            if (!$exchangeRate) {
+                throw new ExchangeRateException($this->convertCurrency->getName());
+            }
             $rate = $exchangeRate[0]->getValue();
 
             $convert = $amount * $rate;
         } else {
             /** @var CurrencyExchangeRate $exchangeRate */
             $exchangeRate = $this->exchangeRateRepository->findBy(
-                ['currency_id' => $this->wallet->getCurrency()->getId()],
+                ['currency_id' => $this->walletCurrency->getId()],
                 ['id' => 'DESC'],
-                1, 0);
+                1, 0
+            );
+            if (!$exchangeRate) {
+                throw new ExchangeRateException($this->walletCurrency->getName());
+            }
             $rate = $exchangeRate[0]->getValue();
 
             $convert = $amount / $rate;
         }
 
-        return $convert;
+        return (int) round($convert);
     }
 }

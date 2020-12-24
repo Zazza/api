@@ -1,7 +1,12 @@
 <?php
-namespace App\Wallet;
+namespace App\Wallet\ExchangeRate;
 
-class Exchange extends Source
+/**
+ * Class Exchange
+ * API for exchangeratesapi.io
+ * @package App\Wallet\Source
+ */
+class Exchange extends Common
 {
     const ID = 5;
     const API_URL = 'https://api.exchangeratesapi.io/latest?symbols=USD&base=';
@@ -9,10 +14,13 @@ class Exchange extends Source
         'RUB'
     ];
 
+    /**
+     * @param $currency
+     * @return string
+     */
     public function request($currency): string
     {
-        $guzzle = new Guzzle();
-        $response = $guzzle->request(
+        $response = $this->guzzle->request(
             self::API_URL . $currency,
             Guzzle::METHOD_GET
         );

@@ -27,12 +27,12 @@ class StaticCurrency
      */
     private $main;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -44,7 +44,7 @@ class StaticCurrency
         return $this;
     }
 
-    public function isMain(): ?bool
+    public function isMain(): bool
     {
         return $this->main;
     }
