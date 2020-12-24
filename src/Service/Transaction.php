@@ -14,21 +14,19 @@ class Transaction extends Common
 {
     /**
      * Added new transaction
-     * @param int $typeId
-     * @param int $reasonId
+     * @param string $type
+     * @param string $reason
      * @throws DbSaveException
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(int $typeId, int $reasonId): void
+    public function add(string $type, string $reason): void
     {
-        //$this->entityManager->getConnection()->beginTransaction();
-
         $transaction = new \App\Entity\Transaction();
         $transaction->setWallet($this->wallet);
         $transaction->setCurrency($this->currencyEntity);
-        $transaction->setTypeId($typeId);
-        $transaction->setReasonId($reasonId);
+        $transaction->setType($type);
+        $transaction->setReason($reason);
         $transaction->setAmount($this->amount);
 
         $errors = $this->validator->validate($transaction);
@@ -38,13 +36,10 @@ class Transaction extends Common
                 $errorList[] = $error->getMessage();
             }
 
-            //$this->entityManager->getConnection()->rollBack();
             throw new DbSaveException(implode(' ', $errorList));
         }
 
         $this->entityManager->persist($transaction);
         $this->entityManager->flush();
-
-        //$this->entityManager->getConnection()->commit();
     }
 }
