@@ -55,13 +55,20 @@ SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT
 В файле .env поправьте _DATABASE_URL_
 
 ```shell script
+# php bin/console doctrine:database:create
+Created database "new_api" for connection named default
+
 # php bin/console doctrine:migrations:migrate
  WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (yes/no) [yes]:
  >
 
 [notice] Migrating up to DoctrineMigrations\Version20201224075334
 [notice] finished in 55.8ms, used 14M memory, 1 migrations executed, 18 sql queries
+```
 
+Добавьте fixtures для проверки работоспособности приложения:
+
+```shell script
 # php bin/console doctrine:fixtures:load
  Careful, database "api" will be purged. Do you want to continue? (yes/no) [no]:
  > yes
