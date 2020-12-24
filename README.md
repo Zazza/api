@@ -84,7 +84,7 @@ Created database "new_api" for connection named default
 
 ## Использование
 
-`# curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://api.local/api/wallet/updateBalance/1' --data 'currency=RUB&type=credit&reason=stock&amount=5'`
+`# curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://domain/api/wallet/updateBalance/1' --data 'currency=RUB&type=credit&reason=stock&amount=5'`
 
 ```shell script
 HTTP/1.1 200 OK
@@ -97,7 +97,7 @@ Date: Thu, 24 Dec 2020 14:05:16 GMT
 X-Robots-Tag: noindex
 ```
 
-`# curl -X GET -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://api.local/api/wallet/getBalance/1'`
+`# curl -X GET -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://domain/api/wallet/getBalance/1'`
 
 ```shell script
 HTTP/1.1 200 OK
