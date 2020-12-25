@@ -56,7 +56,7 @@ SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT
 
 ```shell script
 # php bin/console doctrine:database:create
-Created database "new_api" for connection named default
+Created database "api" for connection named default
 
 # php bin/console doctrine:migrations:migrate
  WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (yes/no) [yes]:
@@ -95,6 +95,8 @@ Connection: keep-alive
 Cache-Control: no-cache, private
 Date: Thu, 24 Dec 2020 14:05:16 GMT
 X-Robots-Tag: noindex
+
+{"result":true}
 ```
 
 `# curl -X GET -H 'Content-Type: application/x-www-form-urlencoded' -i 'http://domain/api/wallet/getBalance/1'`
