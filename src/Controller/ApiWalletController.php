@@ -8,8 +8,9 @@ use App\Exception\WalletNotFoundException;
 use App\Exception\CurrencyNotFoundException;
 use \Doctrine\DBAL\ConnectionException;
 use App\Service\Wallet as WalletService;
-use App\Service\Transaction as TransactionService;
 use App\Wallet\Convert;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,7 @@ class ApiWalletController extends AbstractController
         return $this->json([
             'currency' => $wallet->getCurrency()->getName(),
             'amount' => (string)($wallet->getAmount() / Convert::CAST)
-        ]);//, 200, [JSON_NUMERIC_CHECK]);
+        ]);
     }
 
     /**
@@ -40,36 +41,36 @@ class ApiWalletController extends AbstractController
      * @param Request $request
      * @param int $id
      * @param WalletService $walletService
-     * @param TransactionService $transactionService
      * @return Response
-     * @throws DbSaveException
-     * @throws ExchangeRateException
      * @throws WalletNotFoundException
      * @throws CurrencyNotFoundException
-     * @throws ConnectionException
      */
     public function updateBalance(
         Request $request,
         int $id,
-        WalletService $walletService,
-        TransactionService $transactionService
+        WalletService $walletService
     ): Response
     {
         $walletService->setWallet($id);
 
-        $transactionService
-            ->setWallet($id)
-            ->setCurrency($request->request->get('currency'))
-            ->setAmount($request->get('amount'))
-            ->add(
-                $request->get('type'),
-                $request->get('reason')
-            );
+        $walletService->beginTransaction();
 
         $walletService
-            ->setCurrency($request->request->get('currency'))
-            ->setAmount($request->get('amount'))
-            ->updateBalance();
+            ->setCurrency($request->request->get('currency', ''))
+            ->setAmount($request->get('amount', 0));
+
+        try {
+            $walletService->addTransaction(
+                $request->get('type', false),
+                $request->get('reason', false)
+            );
+            $walletService->updateBalance();
+            $walletService->commitTransaction();
+        } catch (\Throwable $e) {
+            $walletService->rollbackTransaction();
+
+            throw $e;
+        }
 
         return $this->json([
             'result' => true

@@ -115,4 +115,19 @@ class Common
 
         return $this;
     }
+
+    public function beginTransaction(): void
+    {
+        $this->entityManager->getConnection()->beginTransaction();
+    }
+
+    public function rollbackTransaction(): void
+    {
+        $this->entityManager->getConnection()->rollBack();
+    }
+
+    public function commitTransaction(): void
+    {
+        $this->entityManager->getConnection()->commit();
+    }
 }
