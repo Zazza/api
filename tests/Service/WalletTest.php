@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 use App\Entity\StaticCurrency;
 use App\Entity\Wallet;
 use App\Exception\CurrencyNotFoundException;
+use App\Exception\DbSaveException;
 use App\Exception\WalletNotFoundException;
 use App\Service\Wallet as WalletService;
 use App\Wallet\Convert;
@@ -70,6 +71,21 @@ class WalletTest extends WebTestCase
             ->setWallet($this->wallets[0]->getId())
             ->setCurrency('EUR')
             ->setAmount(1)
+            ->updateBalance();
+    }
+
+    public function testNegativeBalanceException(): void
+    {
+        self::bootKernel();
+        $this->walletService = self::$container->get(WalletService::class);
+
+        $this->expectException(DbSaveException::class);
+        $this->expectErrorMessage('Balance cannot be less than 0.');
+
+        $this->walletService
+            ->setWallet($this->wallets[0]->getId())
+            ->setCurrency('USD')
+            ->setAmount(-$this->wallets[0]->getAmount() - 1)
             ->updateBalance();
     }
 

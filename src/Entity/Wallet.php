@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\WalletRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=WalletRepository::class)
@@ -29,6 +30,7 @@ class Wallet
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\PositiveOrZero(message="Balance cannot be less than 0.")
      */
     private $amount;
 
