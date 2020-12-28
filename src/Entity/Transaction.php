@@ -5,8 +5,6 @@ namespace App\Entity;
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Wallet\TransactionType;
-use App\Wallet\TransactionReason;
 
 /**
  * @ORM\Entity(repositoryClass=TransactionRepository::class)
@@ -21,16 +19,16 @@ class Transaction
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Assert\Choice(callback="getReasons", message="Choose a valid transaction reason [stock|refund].")
+     * @ORM\ManyToOne(targetEntity="App\Entity\StaticTransactionReason", inversedBy="reasons")
+     * @Assert\NotNull(message="Choose a valid transaction reason [stock|refund].")
      */
-    private $reason_id;
+    private $reason;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Assert\Choice(callback="getTypes", message="Choose a valid transaction type [debit|credit].")
+     * @ORM\ManyToOne(targetEntity="App\Entity\StaticTransactionType", inversedBy="types")
+     * @Assert\NotNull(message="Choose a valid transaction type [debit|credit].")
      */
-    private $type_id;
+    private $type;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\StaticCurrency", inversedBy="currencies")
@@ -67,26 +65,26 @@ class Transaction
         return $this->id;
     }
 
-    public function getReasonId(): int
+    public function getReason(): StaticTransactionReason
     {
-        return $this->reason_id;
+        return $this->reason;
     }
 
-    public function setReason(string $reason): self
+    public function setReason(StaticTransactionReason $reason): self
     {
-        $this->reason_id = array_search($reason,TransactionReason::VALUES);
+        $this->reason = $reason;
 
         return $this;
     }
 
-    public function getTypeId(): int
+    public function getType(): StaticTransactionType
     {
-        return $this->type_id;
+        return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(StaticTransactionType $type): self
     {
-        $this->type_id = array_search($type,TransactionType::VALUES);
+        $this->type = $type;
 
         return $this;
     }
@@ -125,15 +123,5 @@ class Transaction
         $this->amount = $amount;
 
         return $this;
-    }
-
-    public static function getReasons()
-    {
-        return array_keys(TransactionType::VALUES);
-    }
-
-    public static function getTypes()
-    {
-        return array_keys(TransactionReason::VALUES);
     }
 }

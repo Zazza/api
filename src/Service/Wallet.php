@@ -4,6 +4,8 @@ namespace App\Service;
 use App\Entity\Transaction;
 use App\Exception\DbSaveException;
 use App\Exception\ExchangeRateException;
+use App\Exception\TransactionReasonNotFoundException;
+use App\Exception\TransactionTypeNotFoundException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
@@ -51,14 +53,16 @@ class Wallet extends Common
      * @throws DbSaveException
      * @throws ORMException
      * @throws OptimisticLockException
+     * @throws TransactionTypeNotFoundException
+     * @throws TransactionReasonNotFoundException
      */
     public function addTransaction(string $type, string $reason): void
     {
         $transaction = new Transaction();
         $transaction->setWallet($this->wallet);
         $transaction->setCurrency($this->currencyEntity);
-        $transaction->setType($type);
-        $transaction->setReason($reason);
+        $transaction->setType($this->getStaticTransactionType($type));
+        $transaction->setReason($this->getStaticTransactionReason($reason));
         $transaction->setAmount($this->amount);
 
         $errors = $this->validator->validate($transaction);

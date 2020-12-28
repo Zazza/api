@@ -2,8 +2,12 @@
 namespace App\Service;
 
 use App\Entity\StaticCurrency;
+use App\Entity\StaticTransactionReason;
+use App\Entity\StaticTransactionType;
 use App\Entity\Wallet;
 use App\Exception\CurrencyNotFoundException;
+use App\Exception\TransactionReasonNotFoundException;
+use App\Exception\TransactionTypeNotFoundException;
 use App\Exception\WalletNotFoundException;
 use App\Wallet\Convert;
 use Doctrine\ORM\EntityManager;
@@ -103,6 +107,40 @@ class Common
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $type
+     * @return StaticTransactionType
+     * @throws TransactionTypeNotFoundException
+     */
+    public function getStaticTransactionType(string $type): StaticTransactionType
+    {
+        $repository = $this->entityManager->getRepository(StaticTransactionType::class);
+        /** @var StaticTransactionType $transactionType */
+        $transactionType = $repository->findOneBy(['name' => $type]);
+        if (!$transactionType) {
+            throw new TransactionTypeNotFoundException($type);
+        }
+
+        return $transactionType;
+    }
+
+    /**
+     * @param string $reason
+     * @return StaticTransactionReason
+     * @throws TransactionReasonNotFoundException
+     */
+    public function getStaticTransactionReason(string $reason): StaticTransactionReason
+    {
+        $repository = $this->entityManager->getRepository(StaticTransactionReason::class);
+        /** @var StaticTransactionReason $transactionReason */
+        $transactionReason = $repository->findOneBy(['name' => $reason]);
+        if (!$transactionReason) {
+            throw new TransactionReasonNotFoundException($reason);
+        }
+
+        return $transactionReason;
     }
 
     /**

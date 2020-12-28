@@ -24,7 +24,10 @@
 последние 7 дней.
 
 ```postgresql
-SELECT SUM(amount) FROM transaction WHERE reason_id = 2 AND created_at > CURRENT_DATE - interval '7' day;
+SELECT SUM(t.amount) 
+FROM transaction AS t
+LEFT JOIN static_transaction_reason AS r ON (r.id = t.reason_id) 
+WHERE r.name = 'refund' AND created_at > CURRENT_DATE - interval '7' day;
 ```
 Примечание: можно хранить 'reason_id', точнее 'reason' и как VARCHAR (stock, refund). INT был выбран для экономии места занимаемого БД.
 Аналогично и для type_id.
@@ -120,9 +123,9 @@ i# ./bin/phpunit
  PHPUnit 7.5.20 by Sebastian Bergmann and contributors.
  
  Testing Project Test Suite
- ...........                                                       11 / 11 (100%)
+ ............                                                      12 / 12 (100%)
  
- Time: 1.12 seconds, Memory: 34.00 MB
+ Time: 402 ms, Memory: 22.00 MB
  
- OK (11 tests, 18 assertions)
+ OK (12 tests, 20 assertions)
 ```
